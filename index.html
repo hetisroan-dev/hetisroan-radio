@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HetIsRoan FM - Live Radio</title>
     <style>
-        /* CSS Styling */
+        /* CSS Styling voor een strakke, donkere speler */
         body {
             background-color: #121212;
             color: #ffffff;
@@ -28,10 +28,10 @@
         .player-card {
             background: #1e1e1e;
             border-radius: 16px;
-            padding: 10px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
             border: 1px solid #2d2d2d;
+            overflow: hidden;
         }
 
         iframe {
@@ -41,10 +41,10 @@
             border-radius: 12px;
         }
 
-        #status-melding {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #888;
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -53,27 +53,16 @@
     <div class="container">
         <h1>HetIsRoan FM</h1>
         <div class="player-card">
-            <!-- De iframe met veilige https:// link -->
-            <iframe id="radio-iframe" src="https://listen.hetisroan.nl/public/hetisroan_fm/embed" allowtransparency="true"></iframe>
+            <!-- AzuraCast Embed Speler via https:// -->
+            <iframe src="https://listen.hetisroan.nl/public/hetisroan_fm/embed" frameborder="0" allowtransparency="true"></iframe>
         </div>
-        <div id="status-melding">Verbinding maken met de stream...</div>
     </div>
 
     <script>
-        // JavaScript voor extra controle en feedback
-        const iframe = document.getElementById('radio-iframe');
-        const statusMelding = document.getElementById('status-melding');
-
-        // Controleer of de iframe na 4 seconden moeite heeft met laden
-        setTimeout(() => {
-            try {
-                // Als de server lokaal staat en niet bereikbaar is vanaf het internet, 
-                // kun je hier eventueel extra JavaScript-logica toevoegen.
-                statusMelding.innerHTML = "Tip: Als de speler niet laadt, is de lokale server mogelijk niet bereikbaar via het openbare internet.";
-            } catch (e) {
-                console.error("Kon status niet controleren", e);
-            }
-        }, 4000);
+        // JavaScript om te controleren of de pagina geladen is
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("HetIsRoan FM website succesvol geladen!");
+        });
     </script>
 
 </body>
