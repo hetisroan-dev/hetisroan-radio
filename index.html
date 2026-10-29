@@ -1,69 +1,182 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HetIsRoan FM - Live Radio</title>
-    <style>
-        /* CSS Styling voor een strakke, donkere speler */
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HetIsRoan FM - Now Playing Widget</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            text-align: center;
-        }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        .player-card {
-            background: #1e1e1e;
-            border-radius: 16px;
-            padding: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-            border: 1px solid #2d2d2d;
-            overflow: hidden;
-        }
+    .now-playing-card {
+      background: linear-gradient(145deg, #1e1e2f, #141420);
+      border: 1px solid #2d2d42;
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
 
-        iframe {
-            width: 100%;
-            height: 150px;
-            border: 0;
-            border-radius: 12px;
-        }
+    .album-art {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 20px auto;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      background-color: #2a2a3a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-        }
-    </style>
+    .album-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .song-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .artist-name {
+      font-size: 15px;
+      color: #a0a0b8;
+      margin-bottom: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .play-btn {
+      background-color: #5c24b5;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .play-btn:hover {
+      background-color: #6e2bdc;
+      transform: scale(1.05);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background-color: #28a745;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+    .status-badge.offline {
+      background-color: #dc3545;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>HetIsRoan FM</h1>
-        <div class="player-card">
-            <!-- AzuraCast Embed Speler via https:// -->
-            <iframe src="http://listen.hetisroan.nl/public/hetisroan_fm/embed" frameborder="0" allowtransparency="true" style="width: 100%; min-height: 150px; height: 150px; border: 0;"></iframe>
-        </div>
+  <div class="now-playing-card">
+    <div id="status" class="status-badge">LIVE</div>
+    
+    <div class="album-art">
+      <img id="art" src="https://via.placeholder.com/180?text=HetIsRoan+FM" alt="Album Art">
     </div>
 
-    <script>
-        // JavaScript om te controleren of de pagina geladen is
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("HetIsRoan FM website succesvol geladen!");
-        });
-    </script>
+    <div class="song-title" id="title">Laden...</div>
+    <div class="artist-name" id="artist">HetIsRoan FM</div>
+
+    <div class="controls">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+    </div>
+
+    <!-- Audio element gekoppeld aan de AzuraCast stream -->
+    <audio id="radioStream" src="https://listen.hetisroan.nl/listen/hetisroan_fm/radio.mp3"></audio>
+  </div>
+
+  <script>
+    const apiUrl = "https://listen.hetisroan.nl/api/nowplaying/hetisroan_fm";
+    const audio = document.getElementById("radioStream");
+    const playBtn = document.getElementById("playBtn");
+
+    // Live metadata ophalen uit AzuraCast API
+    async function updateNowPlaying() {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Netwerkfout");
+        
+        const data = await response.json();
+        
+        document.getElementById("title").innerText = data.now_playing.song.title || "Onbekend nummer";
+        document.getElementById("artist").innerText = data.now_playing.song.artist || "HetIsRoan FM";
+        
+        if (data.now_playing.song.art) {
+          document.getElementById("art").src = data.now_playing.song.art;
+        }
+
+        document.getElementById("status").innerText = "LIVE";
+        document.getElementById("status").classList.remove("offline");
+      } catch (error) {
+        console.error("Kon metadata niet laden:", error);
+        document.getElementById("status").innerText = "OFFLINE / LOCAL";
+        document.getElementById("status").classList.add("offline");
+      }
+    }
+
+    // Audio afspelen / pauzeren
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play();
+        playBtn.innerText = "❚❚";
+      } else {
+        audio.pause();
+        playBtn.innerText = "▶";
+      }
+    }
+
+    // Elke 10 seconden de metadata verversen
+    updateNowPlaying();
+    setInterval(updateNowPlaying, 10000);
+  </script>
 
 </body>
 </html>
