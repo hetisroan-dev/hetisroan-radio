@@ -1,1 +1,80 @@
-<iframe src="http://listen.hetisroan.nl/public/hetisroan_fm/embed" frameborder="0" allowtransparency="true" style="width: 100%; min-height: 150px; height: 150px; border: 0;"></iframe>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HetIsRoan FM - Live Radio</title>
+    <style>
+        /* CSS Styling */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .player-card {
+            background: #1e1e1e;
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #2d2d2d;
+        }
+
+        iframe {
+            width: 100%;
+            height: 150px;
+            border: 0;
+            border-radius: 12px;
+        }
+
+        #status-melding {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>HetIsRoan FM</h1>
+        <div class="player-card">
+            <!-- De iframe met veilige https:// link -->
+            <iframe id="radio-iframe" src="https://listen.hetisroan.nl/public/hetisroan_fm/embed" allowtransparency="true"></iframe>
+        </div>
+        <div id="status-melding">Verbinding maken met de stream...</div>
+    </div>
+
+    <script>
+        // JavaScript voor extra controle en feedback
+        const iframe = document.getElementById('radio-iframe');
+        const statusMelding = document.getElementById('status-melding');
+
+        // Controleer of de iframe na 4 seconden moeite heeft met laden
+        setTimeout(() => {
+            try {
+                // Als de server lokaal staat en niet bereikbaar is vanaf het internet, 
+                // kun je hier eventueel extra JavaScript-logica toevoegen.
+                statusMelding.innerHTML = "Tip: Als de speler niet laadt, is de lokale server mogelijk niet bereikbaar via het openbare internet.";
+            } catch (e) {
+                console.error("Kon status niet controleren", e);
+            }
+        }, 4000);
+    </script>
+
+</body>
+</html>
