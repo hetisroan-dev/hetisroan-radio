@@ -129,54 +129,17 @@
       <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
     </div>
 
-    <!-- Audio element gekoppeld aan de AzuraCast stream -->
-    <audio id="radioStream" src="http://listen.hetisroan.nl/listen/hetisroan_fm/radio.mp3"></audio>
+    <!-- Audio element gekoppeld aan de lokale AzuraCast stream -->
+    <audio id="radioStream" src="https://localhost/listen/hetisroan_fm/radio.mp3"></audio>
   </div>
 
   <script>
-    const apiUrl = "http://listen.hetisroan.nl/listen/hetisroan_fm/radio.mp3";
+    // Officiële API URL voor metadata van AzuraCast
+    const apiUrl = "https://localhost/api/nowplaying/hetisroan_fm";
     const audio = document.getElementById("radioStream");
     const playBtn = document.getElementById("playBtn");
 
     // Live metadata ophalen uit AzuraCast API
     async function updateNowPlaying() {
       try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Netwerkfout");
-        
-        const data = await response.json();
-        
-        document.getElementById("title").innerText = data.now_playing.song.title || "Onbekend nummer";
-        document.getElementById("artist").innerText = data.now_playing.song.artist || "HetIsRoan FM";
-        
-        if (data.now_playing.song.art) {
-          document.getElementById("art").src = data.now_playing.song.art;
-        }
-
-        document.getElementById("status").innerText = "LIVE";
-        document.getElementById("status").classList.remove("offline");
-      } catch (error) {
-        console.error("Kon metadata niet laden:", error);
-        document.getElementById("status").innerText = "OFFLINE / LOCAL";
-        document.getElementById("status").classList.add("offline");
-      }
-    }
-
-    // Audio afspelen / pauzeren
-    function togglePlay() {
-      if (audio.paused) {
-        audio.play();
-        playBtn.innerText = "❚❚";
-      } else {
-        audio.pause();
-        playBtn.innerText = "▶";
-      }
-    }
-
-    // Elke 10 seconden de metadata verversen
-    updateNowPlaying();
-    setInterval(updateNowPlaying, 10000);
-  </script>
-
-</body>
-</html>
+        const
